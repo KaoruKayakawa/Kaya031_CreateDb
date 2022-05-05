@@ -1,0 +1,5 @@
+﻿■ ＤＢ接続文字列
+　a). "Trust Server Certificate=true" を付加する。
+　b). ミラーリングを行っているサーバーでは "Failover Partner=x.x.x.x"、及び "Initial Catalog=xxxxx" を付加する。
+例）
+　Server=192.168.201.92;Failover Partner=192.168.201.93;Initial Catalog=master;Trust Server Certificate=true;Integrated Security=false;User ID=uid;Password=pwd
