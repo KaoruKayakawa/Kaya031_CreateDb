@@ -20,6 +20,7 @@ GO
 -- 更新			: 2021/10/19　茅川
 --					: 2021/12/08　茅川
 --					: 2022/02/25　茅川
+--					: 2022/05/09　茅川
 -- ====================================================
 CREATE PROCEDURE [dbo].[UPDATE_WITH_TYUMON_KNR_MST]
 AS
@@ -121,32 +122,34 @@ BEGIN
 		
 		-- 新規レコードの [適用日] 以外のプライマリキーが一致するレコードを、更新対象に含める。
 		-- ※ 本プロシージャでの削除処理を、正しく行うために必要。
+		SELECT DISTINCT STKF_KCD, STKF_HTCD, STKF_SCD, STKF_STR, STKF_END
+		INTO #wt_UPDATE_WITH_TYUMON_KNR_MST_101_1
+		FROM #wt_UPDATE_WITH_TYUMON_KNR_MST_101;
+
 		WITH
 			t1 AS (
-				SELECT DISTINCT STKF_KCD, STKF_HTCD, STKF_SCD, STKF_STR, STKF_END
-				FROM #wt_UPDATE_WITH_TYUMON_KNR_MST_101
-			),
-			t2 AS (
 				SELECT a.*
 				FROM TYUMON_KNR_MST_now a
-				INNER JOIN t1
-				ON a.STKF_KCD = t1.STKF_KCD
-					AND a.STKF_HTCD = t1.STKF_HTCD
-					AND a.STKF_SCD = t1.STKF_SCD
-					AND a.STKF_STR = t1.STKF_STR
-					AND a.STKF_END = t1.STKF_END
-				LEFT OUTER JOIN #wt_UPDATE_WITH_TYUMON_KNR_MST_101 b
+				INNER JOIN #wt_UPDATE_WITH_TYUMON_KNR_MST_101_1 b
 				ON a.STKF_KCD = b.STKF_KCD
 					AND a.STKF_HTCD = b.STKF_HTCD
 					AND a.STKF_SCD = b.STKF_SCD
 					AND a.STKF_STR = b.STKF_STR
 					AND a.STKF_END = b.STKF_END
-					AND a.STKF_TEKIYOYMD = b.STKF_TEKIYOYMD
-				WHERE b.STKF_KCD IS NULL
+				LEFT OUTER JOIN #wt_UPDATE_WITH_TYUMON_KNR_MST_101 c
+				ON a.STKF_KCD = c.STKF_KCD
+					AND a.STKF_HTCD = c.STKF_HTCD
+					AND a.STKF_SCD = c.STKF_SCD
+					AND a.STKF_STR = c.STKF_STR
+					AND a.STKF_END = c.STKF_END
+					AND a.STKF_TEKIYOYMD = c.STKF_TEKIYOYMD
+				WHERE c.STKF_KCD IS NULL
 			)
 		INSERT INTO #wt_UPDATE_WITH_TYUMON_KNR_MST_101
 		SELECT *, dbo.CONVERT_HTCD(STKF_KCD, STKF_HTCD) AS TENCD
-		FROM t2;
+		FROM t1;
+
+		DROP TABLE #wt_UPDATE_WITH_TYUMON_KNR_MST_101_1;
 
 		-- 新規レコードより大きい [適用日] を持つレコードが既に存在する場合は、そのレコードも更新対象に含める。
 		-- ※ 本プロシージャで行われる削除処理を、再度行う必要がある。

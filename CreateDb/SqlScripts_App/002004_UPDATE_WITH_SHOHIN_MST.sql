@@ -22,6 +22,7 @@ GO
 --					: 2021/12/08　茅川
 --					: 2022/02/02　茅川
 --					: 2022/02/25　茅川
+--					: 2022/05/09　茅川
 -- ====================================================
 CREATE PROCEDURE [dbo].[UPDATE_WITH_SHOHIN_MST]
 AS
@@ -182,29 +183,31 @@ BEGIN
 
 		-- 新規レコードの [適用日] 以外のプライマリキーが一致するレコードを、更新対象に含める。
 		-- ※ 本プロシージャでの削除処理を、正しく行うために必要。
+		SELECT DISTINCT SSHM_KCD, SSHM_HTCD, SSHM_SCD
+		INTO #wt_UPDATE_WITH_SHOHIN_MST_101_1
+		FROM #wt_UPDATE_WITH_SHOHIN_MST_101;
+
 		WITH
 			t1 AS (
-				SELECT DISTINCT SSHM_KCD, SSHM_HTCD, SSHM_SCD
-				FROM #wt_UPDATE_WITH_SHOHIN_MST_101
-			),
-			t2 AS (
 				SELECT a.*
 				FROM SHOHIN_MST_now a
-				INNER JOIN t1
-				ON a.SSHM_KCD = t1.SSHM_KCD
-					AND a.SSHM_HTCD = t1.SSHM_HTCD
-					AND a.SSHM_SCD = t1.SSHM_SCD
-				LEFT OUTER JOIN #wt_UPDATE_WITH_SHOHIN_MST_101 b
+				INNER JOIN #wt_UPDATE_WITH_SHOHIN_MST_101_1 b
 				ON a.SSHM_KCD = b.SSHM_KCD
 					AND a.SSHM_HTCD = b.SSHM_HTCD
 					AND a.SSHM_SCD = b.SSHM_SCD
-					AND a.SSHM_TEKIYOYMD = b.SSHM_TEKIYOYMD
-				WHERE b.SSHM_KCD IS NULL
+				LEFT OUTER JOIN #wt_UPDATE_WITH_SHOHIN_MST_101 c
+				ON a.SSHM_KCD = c.SSHM_KCD
+					AND a.SSHM_HTCD = c.SSHM_HTCD
+					AND a.SSHM_SCD = c.SSHM_SCD
+					AND a.SSHM_TEKIYOYMD = c.SSHM_TEKIYOYMD
+				WHERE c.SSHM_KCD IS NULL
 			)
 		INSERT INTO #wt_UPDATE_WITH_SHOHIN_MST_101
 		SELECT *, dbo.CONVERT_HTCD(SSHM_KCD, SSHM_HTCD) AS TENCD,
 			CAST(NULL AS datetime) AS DISPPERIODSTR, CAST(NULL AS datetime) AS DISPPERIODEND
-		FROM t2;
+		FROM t1;
+
+		DROP TABLE #wt_UPDATE_WITH_SHOHIN_MST_101_1;
 
 		/* 現状において、保留は発生しない
 		-- 保留レコードを登録対象に含める ->
