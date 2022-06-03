@@ -19,6 +19,7 @@ GO
 -- 作成日		: 2021/05/04  作成者 : 茅川
 -- 変更			: 2022/03/31  茅川
 --				: 2022/04/15  茅川
+--				: 2022/06/03  茅川
 -- ====================================================
 CREATE PROCEDURE [dbo].[IMPORT_SHOHIN]
 AS
@@ -549,7 +550,12 @@ BEGIN
 			CSH_NAIYO,
 			CSH_GENZAIRYO,
 			CSH_SEIBUN,
+
+			/* 更新前レコードの値を引き継ぐ　->　CSV 設定値を用いる　（2022-06-03）
 			SSHM_KEYWORD,
+			*/
+			CSH_SEARCHWORD,
+
 			CSH_CHIRASHIKBN,
 			0,
 			CSH_JANCD6,
