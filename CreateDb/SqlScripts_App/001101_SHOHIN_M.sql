@@ -16,6 +16,7 @@ CREATE TABLE [dbo].[SHOHIN_M](
 	[SHM_SCD] [bigint] NOT NULL,
 	[SHM_JANCD] [varchar](20) NULL,
 	[SHM_BUMONCD] [smallint] NULL,
+	[SHM_BURUICD] [int] NULL,
 	[SHM_SHONAME] [nvarchar](100) NOT NULL,
 	[SHM_MAKNAME] [varchar](30) NULL,
 	[SHM_KIKNAME] [varchar](15) NULL,

@@ -23,6 +23,7 @@ GO
 --					: 2022/02/02　茅川
 --					: 2022/02/25　茅川
 --					: 2022/05/09　茅川
+--					: 2022/06/06　茅川
 -- ====================================================
 CREATE PROCEDURE [dbo].[UPDATE_WITH_SHOHIN_MST]
 AS
@@ -268,6 +269,7 @@ BEGIN
 			SSHM_UPDATECNT,
 			SSHM_JANCD1,
 			SSHM_BUMONCD,
+			SSHM_BURUICD,
 			SSHM_SHONAME,
 			SSHM_MAKNAME,
 			NULL,
@@ -365,6 +367,7 @@ BEGIN
 				SHM_SCD,
 				SHM_JANCD,
 				SHM_BUMONCD,
+				SHM_BURUICD,
 				SHM_SHONAME,
 				SHM_MAKNAME,
 				SHM_KIKNAME,
@@ -431,6 +434,7 @@ BEGIN
 				SHM_SCD,
 				SHM_JANCD,
 				SHM_BUMONCD,
+				SHM_BURUICD,
 				SHM_SHONAME,
 				SHM_MAKNAME,
 				SHM_KIKNAME,
