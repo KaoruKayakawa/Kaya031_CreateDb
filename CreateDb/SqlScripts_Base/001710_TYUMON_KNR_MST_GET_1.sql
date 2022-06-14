@@ -14,10 +14,11 @@ GO
 -- ====================================================
 -- 名称			: TYUMON_KNR_MST_GET_1
 -- 機能			: 一時テーブル [#wt_TYUMON_KNR_MST_GET_1_1] の、以下項目に合致するレコードを、[vi_TYUMON_KNR_MST] から取得する。
---					: CSO_KCD, CSO_TENCD, CSO_SCD, CSO_STR, CSO_END
+--					: CSO_KCD, CSO_TENCD, CSO_SCD, CSO_KIKAKUCD
 -- 引き数		: 
 -- 戻り値		: 
 -- 作成日		: 2021/12/14  作成者 : 茅川
+-- 変更			: 2022/06/09  茅川
 -- ====================================================
 CREATE PROCEDURE [dbo].[TYUMON_KNR_MST_GET_1]
 AS
@@ -29,7 +30,7 @@ BEGIN
 	BEGIN TRY
 		WITH
 			t2 AS (
-				SELECT DISTINCT CSO_KCD, CSO_TENCD, CSO_SCD, CSO_STR, CSO_END
+				SELECT DISTINCT CSO_KCD, CSO_TENCD, CSO_SCD, CSO_KIKAKUCD
 				FROM #wt_TYUMON_KNR_MST_GET_1_1
 			)
 		SELECT t1.*
@@ -38,8 +39,7 @@ BEGIN
 		ON t1.STKF_KCD = t2.CSO_KCD
 			AND t1.STKF_HTCD = t2.CSO_TENCD
 			AND t1.STKF_SCD = t2.CSO_SCD
-			AND t1.STKF_STR = t2.CSO_STR
-			AND t1.STKF_END = t2.CSO_END;
+			AND t1.STKF_KIKAKUCD = t2.CSO_KIKAKUCD;
 	END TRY
 	BEGIN CATCH
 		SET @ErrMessage = ERROR_MESSAGE();

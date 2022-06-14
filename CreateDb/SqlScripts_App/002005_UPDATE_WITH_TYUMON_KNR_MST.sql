@@ -21,6 +21,7 @@ GO
 --					: 2021/12/08　茅川
 --					: 2022/02/25　茅川
 --					: 2022/05/09　茅川
+--					: 2022/06/08　茅川
 -- ====================================================
 CREATE PROCEDURE [dbo].[UPDATE_WITH_TYUMON_KNR_MST]
 AS
@@ -90,7 +91,7 @@ BEGIN
 		BEGIN
 			SET @lastExeDt2 = @nowDt;
 
-			EXEC #{-BASE_DB-}#.sys.sp_addextendedproperty @name = @propName_base,
+			EXEC #{-DB-}#.sys.sp_addextendedproperty @name = @propName_base,
 				@value = @lastExeDt2,
 				@level0type = 'SCHEMA',
 				@level0name = N'dbo',
@@ -107,7 +108,7 @@ BEGIN
 			ELSE
 				SET @lastExeDt2= DATEADD(second, 1, @lastExeDt1);
 				
-			EXEC #{-BASE_DB-}#.sys.sp_updateextendedproperty @name = @propName_base,
+			EXEC #{-DB-}#.sys.sp_updateextendedproperty @name = @propName_base,
 				@value = @lastExeDt2 ,
 				@level0type = 'SCHEMA',
 				@level0name = N'dbo',
@@ -122,7 +123,7 @@ BEGIN
 		
 		-- 新規レコードの [適用日] 以外のプライマリキーが一致するレコードを、更新対象に含める。
 		-- ※ 本プロシージャでの削除処理を、正しく行うために必要。
-		SELECT DISTINCT STKF_KCD, STKF_HTCD, STKF_SCD, STKF_STR, STKF_END
+		SELECT DISTINCT STKF_KCD, STKF_HTCD, STKF_SCD, STKF_KIKAKUCD
 		INTO #wt_UPDATE_WITH_TYUMON_KNR_MST_101_1
 		FROM #wt_UPDATE_WITH_TYUMON_KNR_MST_101;
 
@@ -134,14 +135,12 @@ BEGIN
 				ON a.STKF_KCD = b.STKF_KCD
 					AND a.STKF_HTCD = b.STKF_HTCD
 					AND a.STKF_SCD = b.STKF_SCD
-					AND a.STKF_STR = b.STKF_STR
-					AND a.STKF_END = b.STKF_END
+					AND a.STKF_KIKAKUCD = b.STKF_KIKAKUCD
 				LEFT OUTER JOIN #wt_UPDATE_WITH_TYUMON_KNR_MST_101 c
 				ON a.STKF_KCD = c.STKF_KCD
 					AND a.STKF_HTCD = c.STKF_HTCD
 					AND a.STKF_SCD = c.STKF_SCD
-					AND a.STKF_STR = c.STKF_STR
-					AND a.STKF_END = c.STKF_END
+					AND a.STKF_KIKAKUCD = c.STKF_KIKAKUCD
 					AND a.STKF_TEKIYOYMD = c.STKF_TEKIYOYMD
 				WHERE c.STKF_KCD IS NULL
 			)
@@ -168,15 +167,13 @@ BEGIN
 			AND t1.STKF_TEKIYOYMD = t2.UDP_TEKIYOYMD
 			AND t1.STKF_UPDATECNT = t2.UDP_UPDATECNT			-- 更新されたレコードは除く
 			AND t1.STKF_SCD = CAST(t2.UDP_KEY1 AS bigint)
-			AND t1.STKF_STR = CAST(t2.UDP_KEY2 AS datetime)
-			AND t1.STKF_END = CAST(t2.UDP_KEY3 AS datetime)
+			AND t1.STKF_KIKAKUCD = CAST(t2.UDP_KEY2 AS bigint)
 		LEFT OUTER JOIN #wt_UPDATE_WITH_TYUMON_KNR_MST_101 t3		-- 重複する場合もあるので考慮にいれる
 		ON t1.STKF_KCD = t3.STKF_KCD
 			AND t1.STKF_HTCD = t3.STKF_HTCD
 			AND t1.STKF_TEKIYOYMD = t3.STKF_TEKIYOYMD
 			AND t1.STKF_SCD = t3.STKF_SCD
-			AND t1.STKF_STR = t3.STKF_STR
-			AND t1.STKF_END = t3.STKF_END
+			AND t1.STKF_KIKAKUCD = t3.STKF_KIKAKUCD
 		WHERE t3.STKF_KCD IS NULL;
 
 		DELETE FROM UPDATE_PENDING
@@ -189,13 +186,14 @@ BEGIN
 		INNER JOIN #wt_UPDATE_WITH_TYUMON_KNR_MST_101 b
 		ON a.TKF_HTCD = b.TENCD
 			AND a.TKF_SCD = b.STKF_SCD
-			AND a.TKF_STR = b.STKF_STR
-			AND a.TKF_END = b.STKF_END
+			AND a.TKF_KIKAKUCD = b.STKF_KIKAKUCD
 			AND a.TKF_TEKIYOYMD = b.STKF_TEKIYOYMD;
 
 		INSERT INTO TYUMON_KNR_F_now
 		SELECT
 			TENCD,
+			STKF_KIKAKUCD,
+			STKF_KIKAKUKBN,
 			STKF_SCD,
 			STKF_STR,
 			STKF_END,
@@ -218,14 +216,24 @@ BEGIN
 		LEFT OUTER JOIN ft_TYUMON_KNR_F(@delYmd) b
 		ON a.TKF_HTCD = b.TKF_HTCD
 			AND a.TKF_SCD = b.TKF_SCD
-			AND a.TKF_STR = b.TKF_STR
-			AND a.TKF_END = b.TKF_END
+			AND a.TKF_KIKAKUCD = b.TKF_KIKAKUCD
 		WHERE a.TKF_TEKIYOYMD < b.TKF_TEKIYOYMD
 			OR (b.TKF_TEKIYOYMD IS NULL AND a.TKF_TEKIYOYMD <= @delYmd);
 
-		-- 不要レコード削除（終了日）	※ [TKF_END] はプライマリーキーに含まれるので、プライマリーキー単位での削除となる
-		DELETE FROM TYUMON_KNR_F_now
-		WHERE TKF_END < @delYmd;
+		-- 不要レコード削除（終了日）	※ プライマリーキー単位での削除
+		WITH
+			t2 AS (
+				SELECT TKF_HTCD, TKF_SCD, TKF_KIKAKUCD
+				FROM TYUMON_KNR_F_now
+				GROUP BY TKF_HTCD, TKF_SCD, TKF_KIKAKUCD
+				HAVING MAX(TKF_END) < @delYmd
+			)
+		DELETE t1
+		FROM TYUMON_KNR_F_now t1
+		INNER JOIN t2
+		ON t1.TKF_HTCD = t2.TKF_HTCD
+			AND t1.TKF_SCD = t2.TKF_SCD
+			AND t1.TKF_KIKAKUCD = t2.TKF_KIKAKUCD;
 
 		-- テーブル TYUMON_KNR_F の更新（日替わりの一回目は TRUNCATE を行い、全レコードを再作成する） ->
 		DECLARE @propName_app sysname = N'UPDATE_WITH_TYUMON_KNR_MST__Truncate_DateTime';
@@ -254,8 +262,7 @@ BEGIN
 			SELECT 
 				TKF_HTCD,
 				TKF_SCD,
-				TKF_STR,
-				TKF_END,
+				TKF_KIKAKUCD,
 				TKF_NOWSURYO
 			INTO #wt_UPDATE_WITH_TYUMON_KNR_MST_201
 			FROM TYUMON_KNR_F;
@@ -265,6 +272,8 @@ BEGIN
 			INSERT INTO TYUMON_KNR_F
 			SELECT
 				a.TKF_HTCD,
+				a.TKF_KIKAKUCD,
+				a.TKF_KIKAKUKBN,
 				a.TKF_SCD,
 				a.TKF_STR,
 				a.TKF_END,
@@ -278,8 +287,7 @@ BEGIN
 			LEFT OUTER JOIN #wt_UPDATE_WITH_TYUMON_KNR_MST_201 b
 			ON a.TKF_HTCD = b.TKF_HTCD
 				AND a.TKF_SCD = b.TKF_SCD
-				AND a.TKF_STR = b.TKF_STR
-				AND a.TKF_END = b.TKF_END;
+				AND a.TKF_KIKAKUCD = b.TKF_KIKAKUCD;
 
 			DROP TABLE #wt_UPDATE_WITH_TYUMON_KNR_MST_201;
 
@@ -295,38 +303,36 @@ BEGIN
 			SELECT DISTINCT
 				TENCD,
 				STKF_SCD,
-				STKF_STR,
-				STKF_END
+				STKF_KIKAKUCD
 			INTO #wt_UPDATE_WITH_TYUMON_KNR_MST_102
 			FROM #wt_UPDATE_WITH_TYUMON_KNR_MST_101;
 
 			SELECT
 				a.TENCD,
 				a.STKF_SCD,
-				a.STKF_STR,
-				a.STKF_END,
+				a.STKF_KIKAKUCD,
 				ISNULL(b.TKF_NOWSURYO, 0) AS TKF_NOWSURYO
 			INTO #wt_UPDATE_WITH_TYUMON_KNR_MST_202
 			FROM #wt_UPDATE_WITH_TYUMON_KNR_MST_102 a
 			LEFT OUTER JOIN TYUMON_KNR_F b
 			ON a.TENCD = b.TKF_HTCD
 				AND a.STKF_SCD = b.TKF_SCD
-				AND a.STKF_STR = b.TKF_STR
-				AND a.STKF_END = b.TKF_END;
+				AND a.STKF_KIKAKUCD = b.TKF_KIKAKUCD;
 
 			DELETE a
 			FROM TYUMON_KNR_F a
 			INNER JOIN #wt_UPDATE_WITH_TYUMON_KNR_MST_102 b
 			ON a.TKF_HTCD = b.TENCD
 				AND a.TKF_SCD = b.STKF_SCD
-				AND a.TKF_STR = b.STKF_STR
-				AND a.TKF_END = b.STKF_END;
+				AND a.TKF_KIKAKUCD = b.STKF_KIKAKUCD;
 
 			DROP TABLE #wt_UPDATE_WITH_TYUMON_KNR_MST_102;
 
 			INSERT INTO TYUMON_KNR_F
 			SELECT
 				a.TKF_HTCD,
+				a.TKF_KIKAKUCD,
+				a.TKF_KIKAKUKBN,
 				a.TKF_SCD,
 				a.TKF_STR,
 				a.TKF_END,
@@ -340,14 +346,17 @@ BEGIN
 			INNER JOIN #wt_UPDATE_WITH_TYUMON_KNR_MST_202 b
 			ON a.TKF_HTCD = b.TENCD
 				AND a.TKF_SCD = b.STKF_SCD
-				AND a.TKF_STR = b.STKF_STR
-				AND a.TKF_END = b.STKF_END;
+				AND a.TKF_KIKAKUCD = b.STKF_KIKAKUCD;
 
 			DROP TABLE #wt_UPDATE_WITH_TYUMON_KNR_MST_202;
 		END;
 		-- <- テーブル TYUMON_KNR_F の更新（日替わりの一回目は、TRUNCATE を行い、全レコードを再作成する）
 
 		DROP TABLE #wt_UPDATE_WITH_TYUMON_KNR_MST_101;
+
+		-- 不要レコード削除（終了日）	※ プライマリーキー単位削除が行われなかったレコード
+		DELETE FROM TYUMON_KNR_F
+		WHERE TKF_END < @delYmd;
 
 		IF @TranCnt = 0
             COMMIT TRANSACTION;

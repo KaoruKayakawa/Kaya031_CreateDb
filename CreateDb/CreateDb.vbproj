@@ -571,6 +571,9 @@
     <Content Include="SqlScripts_Base\001105_CSV_SHOSUPPORT.sql">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
+    <Content Include="SqlScripts_Base\001107_CSV_SOURYOU_ver1.sql">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
     <Content Include="SqlScripts_Base\001106_CSV_SOURYOU.sql">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>

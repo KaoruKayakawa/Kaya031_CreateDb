@@ -16,6 +16,7 @@ GO
 -- Create date:
 -- Description:	
 -- Update:		2022-02-07　kayakawa
+--             		2022-06-08　kayakawa
 -- =============================================
 CREATE TRIGGER [dbo].[trg_i_TYUMON_KNR_MST_now]
    ON  [dbo].[TYUMON_KNR_MST_now]
@@ -31,8 +32,7 @@ BEGIN
 	ON a.STKF_KCD = b.STKF_KCD
 		AND a.STKF_HTCD = b.STKF_HTCD
 		AND a.STKF_SCD = b.STKF_SCD
-		AND a.STKF_STR = b.STKF_STR
-		AND a.STKF_END = b.STKF_END
+		AND a.STKF_KIKAKUCD = b.STKF_KIKAKUCD
 		AND a.STKF_TEKIYOYMD = b.STKF_TEKIYOYMD;
 
 	IF (SELECT COUNT(*) FROM #wk_trg_i_TYUMON_KNR_MST_now_01 WHERE (cnt_new = 0 AND cnt_old IS NOT NULL AND delfg_old <> 1) OR (cnt_new > 0 AND (cnt_new <> cnt_old OR cnt_old IS NULL))) > 0
@@ -51,8 +51,7 @@ BEGIN
 	ON a.STKF_KCD = b.STKF_KCD
 		AND a.STKF_HTCD = b.STKF_HTCD
 		AND a.STKF_SCD = b.STKF_SCD
-		AND a.STKF_STR = b.STKF_STR
-		AND a.STKF_END = b.STKF_END
+		AND a.STKF_KIKAKUCD = b.STKF_KIKAKUCD
 		AND a.STKF_TEKIYOYMD = b.STKF_TEKIYOYMD;
 
 	INSERT INTO TYUMON_KNR_MST_old
@@ -65,8 +64,7 @@ BEGIN
 	ON a.STKF_KCD = b.STKF_KCD
 		AND a.STKF_HTCD = b.STKF_HTCD
 		AND a.STKF_SCD = b.STKF_SCD
-		AND a.STKF_STR = b.STKF_STR
-		AND a.STKF_END = b.STKF_END
+		AND a.STKF_KIKAKUCD = b.STKF_KIKAKUCD
 		AND a.STKF_TEKIYOYMD = b.STKF_TEKIYOYMD;
 
 	SELECT *
@@ -80,8 +78,7 @@ BEGIN
 	ON a.STKF_KCD = b.STKF_KCD
 		AND a.STKF_HTCD = b.STKF_HTCD
 		AND a.STKF_SCD = b.STKF_SCD
-		AND a.STKF_STR = b.STKF_STR
-		AND a.STKF_END = b.STKF_END
+		AND a.STKF_KIKAKUCD = b.STKF_KIKAKUCD
 		AND a.STKF_TEKIYOYMD = b.STKF_TEKIYOYMD;
 		
 	-- 更新日時の設定（システム日時がメンテナンスされている場合も考慮）

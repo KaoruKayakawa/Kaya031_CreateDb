@@ -18,10 +18,13 @@ GO
 -- 引き数		: 
 -- 戻り値		: 
 -- 作成日		: 2022/03/09  作成者 : 茅川
+-- 変更			: 2022/06/09  茅川
 -- ====================================================
 CREATE PROCEDURE [dbo].[TYUMON_KNR_MST_SET_1]
 	@STKF_KCD int,
 	@STKF_HTCD int,
+	@STKF_KIKAKUCD bigint,
+	@STKF_KIKAKUKBN int,
 	@STKF_SCD bigint,
 	@STKF_STR datetime,
 	@STKF_END datetime,
@@ -77,6 +80,8 @@ BEGIN
 		VALUES (
 			@STKF_KCD,
 			@STKF_HTCD,
+			@STKF_KIKAKUCD,
+			@STKF_KIKAKUKBN,
 			@STKF_SCD,
 			@STKF_STR,
 			@STKF_END,
@@ -124,8 +129,7 @@ BEGIN
 		WHERE STKF_KCD = @STKF_KCD
 			AND STKF_HTCD = @STKF_HTCD
 			AND STKF_SCD = @STKF_SCD
-			AND STKF_STR = @STKF_STR
-			AND STKF_END = @STKF_END
+			AND STKF_KIKAKUCD = @STKF_KIKAKUCD
 			AND STKF_TEKIYOYMD > @STKF_TEKIYOYMD
 			AND STKF_DELFG <> 1;
 
