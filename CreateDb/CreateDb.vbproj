@@ -547,6 +547,36 @@
     <Content Include="SqlScripts_App\001802_APP_SETTING_M.sql">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
+    <Content Include="SqlScripts_App\101101_GET_SHOHIN_M_INFO.sql">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="SqlScripts_App\101102_GET_SHOHIN_M_INFO_ALLPERIOD.sql">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="SqlScripts_App\101103_GET_SHOHIN_M_INFO_ALLPERIOD_WEB.sql">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="SqlScripts_App\101104_GET_SHOHIN_M_INFO_PERIOD.sql">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="SqlScripts_App\101105_GET_SHOHIN_M_INFO_PERIOD_WEB.sql">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="SqlScripts_App\101106_GET_SHOHIN_M_INFO_WEB.sql">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="SqlScripts_App\101201_GET_TYUMON_KNR_F_INFO.sql">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="SqlScripts_App\101202_GET_TYUMON_KNR_F_INFO_ALLPERIOD.sql">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="SqlScripts_App\101203_GET_TYUMON_KNR_F_INFO_PERIOD_WEB.sql">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="SqlScripts_App\101204_GET_TYUMON_KNR_F_INFO_WEB.sql">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
     <Content Include="SqlScripts_App\db_create_drop\Create.sql">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
@@ -908,6 +938,9 @@
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
     <Content Include="SqlScripts_Base\002506_SETTING_MST.sql">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="SqlScripts_Base\001712_TYUMON_KNR_MST_GET_2.sql">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
     <Content Include="SqlScripts_Base\db_create_drop\Drop.sql">
