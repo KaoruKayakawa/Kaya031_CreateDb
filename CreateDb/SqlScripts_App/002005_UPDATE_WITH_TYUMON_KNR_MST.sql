@@ -91,7 +91,7 @@ BEGIN
 		BEGIN
 			SET @lastExeDt2 = @nowDt;
 
-			EXEC #{-DB-}#.sys.sp_addextendedproperty @name = @propName_base,
+			EXEC #{-BASE_DB-}#.sys.sp_addextendedproperty @name = @propName_base,
 				@value = @lastExeDt2,
 				@level0type = 'SCHEMA',
 				@level0name = N'dbo',
@@ -108,7 +108,7 @@ BEGIN
 			ELSE
 				SET @lastExeDt2= DATEADD(second, 1, @lastExeDt1);
 				
-			EXEC #{-DB-}#.sys.sp_updateextendedproperty @name = @propName_base,
+			EXEC #{-BASE_DB-}#.sys.sp_updateextendedproperty @name = @propName_base,
 				@value = @lastExeDt2 ,
 				@level0type = 'SCHEMA',
 				@level0name = N'dbo',
